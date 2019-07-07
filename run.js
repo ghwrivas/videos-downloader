@@ -14,9 +14,9 @@ async function download() {
 
   let url = 'https://elrellano.com/_ficheros/';
   let next = true;
-  let i = 1;
+  let i = lastvideo;
   while (next) {
-    if (i <= lastvideo) {
+    if (i > 0) {
       console.log(`donwload video ${i}`)
       let initDate = new Date();
       await rp({
@@ -35,7 +35,7 @@ async function download() {
       });
       const diff = diff_minutes(new Date(), initDate);
       console.log(`duration ${diff}`)
-      i++;
+      i--;
     } else {
       next = !next;
     }
