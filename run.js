@@ -1,8 +1,8 @@
 const axios = require('axios');
 const fs = require('fs');
 
-const INIT_PAGE = 1;
-const END_PAGE = 3;
+const INIT_PAGE = 4;
+const END_PAGE = 10;
 
 const REGEX_VIDEO_URL = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*).mp4/g
 
