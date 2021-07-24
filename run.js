@@ -1,28 +1,32 @@
-const rp = require("request-promise");
-const fs = require('fs').promises;
-const lastvideo = 10002;
+const axios = require('axios');
+const fs = require('fs');
+
+const INIT_PAGE = 1;
+const END_PAGE = 3;
+
+const REGEX_VIDEO_URL = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*).mp4/g
+
+const URL_PAGES = 'https://elrellano.com/videos/page/';
 
 async function download() {
-  let url = 'https://elrellano.com/_ficheros/';
-  let next = true;
-  let i = lastvideo;
-  let downloads = [];
-  while (next) {
-    if (i > 0) {
-      let initDate = new Date();
-      let filename = `items_${i}_mp4.mp4`;
-      let promise = rp({
-        url: url.concat(filename), method: 'GET',
-        encoding: null,
-        headers: { 'Content-type': 'video/mp4' }
-      }).then((data) => fs.writeFile(`/home/williams/videos/rellano/${filename}`, data, () => console.log(error)))
-        .catch((err) => Promise.resolve({ error: filename }));
-      downloads.push(promise);
-    } else {
-      next = !next;
+  for (let i = INIT_PAGE; i<= END_PAGE; i++) {
+    const { data } = await axios.get(URL_PAGES.concat(i.toString()));
+    const videoUrls = data.match(REGEX_VIDEO_URL);
+    if(videoUrls.length) {
+      for (let j = 0; j < videoUrls.length; j++) {
+        await axios({
+          method: 'get',
+          url: videoUrls[j],
+          responseType: 'stream'
+        }).then((response) => {
+          console.log(`Downlading ${videoUrls[j]}`)
+          response.data.pipe(fs.createWriteStream(`C:\\Users\\wtra\\Videos\\rellano\\page-${i}-video-${j}.mp4`));
+        }).catch(error => {
+          console.log('Error:', error.message)
+        });
+      }
     }
-    i--;
+
   }
-  Promise.all(downloads);
 }
 download();
